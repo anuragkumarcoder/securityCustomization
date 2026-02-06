@@ -3,6 +3,7 @@ package com.example.securtyBasic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -13,24 +14,32 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        http.authorizeHttpRequests(authorizeRequests->authorizeRequests.anyRequest()
+        http.authorizeHttpRequests(authorizeRequests->authorizeRequests
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/user/**").hasAnyRole("USER","ADMIN")
+                .anyRequest()
                 .authenticated());
         http.httpBasic(Customizer.withDefaults());
         return http.build();
     }
     @Bean
+
     public UserDetailsService userDetailsService(){
         UserDetails user1= User.withUsername("Anurag")
                 .password("{noop}password1")
+                .roles("USER")
                 .build();
         UserDetails user2= User.withUsername("user2")
                 .password("{noop}password1")
+                .roles("USER")
                 .build();
         UserDetails admin= User.withUsername("admin")
                 .password("{noop}password1")
+                .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(user1,user2,admin);
         }
