@@ -1,8 +1,10 @@
 package com.example.securtyBasic;
 
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -20,6 +22,32 @@ public class jwtutils {
                 .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key()) // Algorithm detected automatically
                 .compact();
+    }
+    public String getJWTFromHeader(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // Returns the token after "Bearer "
+        }
+        return null;
+    }
+    public boolean validateJwtToken(String authToken) {
+        try {
+            Jwts.parser()
+                    .verifyWith(key())
+                    .build()
+                    .parseSignedClaims(authToken);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+    public String getUserNameFromJwtToken(String token) {
+        return Jwts.parser()
+                .verifyWith(key())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
     }
 
     private SecretKey key() {

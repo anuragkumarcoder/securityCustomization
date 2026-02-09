@@ -42,25 +42,17 @@ public class HelloController {
     public String login(@RequestBody LoginRequest loginRequest) {
         Authentication authentication;
         try {
-            // Step 1: Authenticate the user [06:07:05]
             authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
                             loginRequest.getPassword()
                     )
             );
-        } catch (AuthenticationException e) {
-            // Step 2: Handle failed authentication [06:06:01]
+        } catch (AuthenticationException e){
             return "Fail";
         }
-
-        // Step 3: Set the authentication in the Security Context [06:10:11]
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // Step 4: Get UserDetails from the authentication object [06:11:43]
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-        // Step 5: Generate and return the JWT Token string [06:12:46, 06:24:04]
         return jwtUtils.generateTokensFromUsername(userDetails.getUsername());
     }
 }
