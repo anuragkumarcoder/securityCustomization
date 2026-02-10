@@ -26,10 +26,8 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // 1. Disable CSRF for Postman/stateless APIs
         http.csrf(csrf -> csrf.disable());
 
-        // 2. Configure endpoint permissions
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -37,10 +35,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
         );
 
-        // 3. IMPORTANT: Set session to Stateless for JWT
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // 4. Add the JWT filter before the standard authentication filter
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -20,7 +20,7 @@ public class HelloController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private jwtutils jwtUtils; // Matches your lowercase class name 'jwtutils'
+    private jwtutils jwtUtils;
 
     @GetMapping("/hello")
     @PreAuthorize("hasRole('ADMIN')")
@@ -53,6 +53,6 @@ public class HelloController {
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return jwtUtils.generateTokensFromUsername(userDetails.getUsername());
+        return jwtUtils.generateTokensFromUsername(userDetails);
     }
 }
